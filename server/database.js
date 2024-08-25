@@ -9,9 +9,10 @@
 const mongoose = require("mongoose");
 
 //Connect to mongodb
-mongoose.connect("mongodb+srv://itsranahrishikesh:BvFaj7rhKgifcr8v@cluster0.reeymeq.mongodb.net/paycheck");
+mongoose.connect(process.env.MONGODB_URI);
 
 //Create a Schema for Users
+
 //Simple solution
 // const UserSchema = new mongoose.Schema({
 //     username:String,
@@ -19,6 +20,7 @@ mongoose.connect("mongodb+srv://itsranahrishikesh:BvFaj7rhKgifcr8v@cluster0.reey
 //     firstname:String,
 //     lastname:String
 // });
+
 //More Elegant solution
 const UserSchema = new mongoose.Schema({
     username:{
