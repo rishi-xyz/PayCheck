@@ -16,7 +16,7 @@ const SignupSchema = z.object({
 
 UserRouter.post("/signup",async(req,res)=>{
     const ParsedBody = SignupSchema.safeParse(req.body);
-    if (!ParsedBody){
+    if (!ParsedBody.success){
         return res.status(411).json({
             message:"Incorrect Inputs"
         })
@@ -30,7 +30,7 @@ UserRouter.post("/signup",async(req,res)=>{
         });
     }
 
-    const HashedPassword = await bcrypt.hash(req.body.password, 10);
+    const HashedPassword = await bcrypt.hash(req .body.password, 10);
 
     const CreateUser = await User.create({
         username:req.body.username,
@@ -39,10 +39,7 @@ UserRouter.post("/signup",async(req,res)=>{
         lastname:req.body.lastname,
     });
 
-    const BodyUserId = BodyUser._id;
-    const Token = jwt.sign({
-        BodyUserId
-    },JWT_SECRET);
+    const Token = jwt.sign({ userId: CreateUser._id }, JWT_SECRET);
 
     return res.status(200).json({
         message: "User created successfully",
@@ -50,8 +47,28 @@ UserRouter.post("/signup",async(req,res)=>{
     });
 });
 
-UserRouter.post("/signin", async(req,res)=>{
 
+UserRouter.post("/signin", async (req,res)=>{
+    const InputUser = await User.findOne({username:req.body.username});
+
+    if (!InputUser) {
+        return res.status(401).json({
+            message: "Invalid username or password",
+        });
+    }
+    const PasswordMatch = await bcrypt.compare(req.body.password,InputUser.password);
+    if(!PasswordMatch){
+        return res.status(411).json({
+            message: "Wrong Password"
+        })
+    }
+
+    const Token = jwt.sign({ userId: InputUser._id }, JWT_SECRET);
+    
+    return res.status(200).json({
+        message:"Login successful",
+        token: Token
+    });
 });
 
 module.exports = UserRouter;
