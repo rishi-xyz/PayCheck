@@ -51,10 +51,6 @@ const UserSchema = new mongoose.Schema({
     }
 });
 
-//method to verify or validate given password
-UserSchema.methods.validatePassword = async (givenpassword)=>{
-    const validatedPassword = await bcrypt.compare(givenpassword,this.password);
-};
 
 //Create a model from the Schema
 const User = mongoose.model('User',UserSchema);
