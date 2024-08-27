@@ -7,7 +7,6 @@
  * 5.export
  */
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
 
 //Connect to mongodb
 mongoose.connect(process.env.MONGODB_URI);
@@ -51,12 +50,25 @@ const UserSchema = new mongoose.Schema({
     }
 });
 
+const AccountSchema = new mongoose.Schema({
+    UserId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref:"User",
+        required:true
+    },
+    balance:{
+        type: Number,
+        required: true
+    }
+});
 
 //Create a model from the Schema
 const User = mongoose.model('User',UserSchema);
+const Account = mongoose.model("Account",AccountSchema);
 
 
 //Export user
 module.exports = {
-    User
-};
+    User,
+    Account
+}

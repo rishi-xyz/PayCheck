@@ -4,6 +4,7 @@ const { User } = require("../database");
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = require("../config");
 const bcrypt = require("bcrypt");
+const { authMiddleware } = require("./middleware");
 
 const UserRouter = express.Router();
 
@@ -41,7 +42,7 @@ UserRouter.post("/signup",async(req,res)=>{
 
     const Token = jwt.sign({ userId: CreateUser._id }, JWT_SECRET);
 
-    return res.status(200).json({
+    res.status(200).json({
         message: "User created successfully",
         token: Token
     });
@@ -65,10 +66,51 @@ UserRouter.post("/signin", async (req,res)=>{
 
     const Token = jwt.sign({ userId: InputUser._id }, JWT_SECRET);
     
-    return res.status(200).json({
+    res.status(200).json({
         message:"Login successful",
         token: Token
     });
+});
+
+const UpdateSchema = z.object({
+    password:z.string().min(6).optional(),
+    firstname:z.string().max(50).optional(),
+    lastname:z.string().max(50).optional()
+});
+
+UserRouter.put("/update",authMiddleware,async (req,res) =>{
+    const Parsedbody = UpdateSchema.safeParse(req.body);
+    if(!Parsedbody.success){
+        return res.status(411).json({
+            message:"Error while updating information"
+        });
+    }
+    await User.updateOne({_id:req.userId},Parsedbody);
+    res.status(200).json({
+        message:"Updated Successfully"
+    });
+});
+
+UserRouter.get("/bulk", async (req,res)=>{
+    const filter = req.query.filter || "";
+
+    const users = await User.find({
+        $or:[{
+            firstname:{
+                "$regex" : filter
+            }
+        },{
+            lastname:{
+                "$regex":filter
+            }
+        }]
+    })
+    res.json({user:users.map(user=>({
+        username:user.username,
+        firstname:user.firstname,
+        lastname:user.lastname,
+        _id:user._id,
+    }))})
 });
 
 module.exports = UserRouter;
