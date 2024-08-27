@@ -1,6 +1,6 @@
 const express = require("express");
 const z = require("zod");
-const { User } = require("../database");
+const { User, Account } = require("../database");
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = require("../config");
 const bcrypt = require("bcrypt");
@@ -41,6 +41,11 @@ UserRouter.post("/signup",async(req,res)=>{
     });
 
     const Token = jwt.sign({ userId: CreateUser._id }, JWT_SECRET);
+
+    await Account.create({
+        UserId:CreateUser._id,
+        balance:1+Math.random()*10000
+    });
 
     res.status(200).json({
         message: "User created successfully",
@@ -85,7 +90,7 @@ UserRouter.put("/update",authMiddleware,async (req,res) =>{
             message:"Error while updating information"
         });
     }
-    await User.updateOne({_id:req.userId},Parsedbody);
+    await User.updateOne({_id:req.userId},req.body);
     res.status(200).json({
         message:"Updated Successfully"
     });

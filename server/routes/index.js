@@ -1,5 +1,6 @@
 const express = require("express");
 const UserRouter = require("./user");
+const AccountRouter = require("./account");
 
 //Single routing
 const rootRouter = express.Router();
@@ -10,5 +11,6 @@ const rootRouter = express.Router();
 // const router3 = express.Router();
 
 rootRouter.use("/user",UserRouter);//anything to /api/v1/user follow UserRouter
+rootRouter.use("/account",AccountRouter);//anything to /api/v1/account
 
 module.exports = rootRouter;
