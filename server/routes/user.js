@@ -28,35 +28,42 @@ UserRouter.post("/signup",async(req,res)=>{
             message:"Incorrect Inputs"
         })
     }
-    const BodyUser =  await User.findOne({
-        username:req.body.username
-    })
-    if(BodyUser){
-        return res.status(411).json({
-            message: "Username / Email already exists"
+    try {
+        const BodyUser =  await User.findOne({
+            username:req.body.username
+        })
+        if(BodyUser){
+            return res.status(411).json({
+                message: "Username / Email already exists"
+            });
+        }
+    
+        const HashedPassword = await bcrypt.hash(req.body.password, 10);
+    
+        const CreateUser = await User.create({
+            username:req.body.username,
+            password:HashedPassword,
+            firstname:req.body.firstname,
+            lastname:req.body.lastname,
         });
+    
+        await Account.create({
+            UserId:CreateUser._id,
+            balance:1+Math.random()*10000
+        });
+    
+        const Token = jwt.sign({ userId: CreateUser._id }, JWT_SECRET);
+    
+        return res.status(200).json({
+            message: "User created successfully",
+            token: Token
+        });
+    }catch(error){
+        console.error('Error during signup:', err);
+        return res.status(500).json({
+            message: "Internal Server Error"
+        });        
     }
-
-    const HashedPassword = await bcrypt.hash(req.body.password, 10);
-
-    const CreateUser = await User.create({
-        username:req.body.username,
-        password:HashedPassword,
-        firstname:req.body.firstname,
-        lastname:req.body.lastname,
-    });
-
-    await Account.create({
-        UserId:CreateUser._id,
-        balance:1+Math.random()*10000
-    });
-
-    const Token = jwt.sign({ userId: CreateUser._id }, JWT_SECRET);
-
-    res.status(200).json({
-        message: "User created successfully",
-        token: Token
-    });
 });
 
 
@@ -77,7 +84,7 @@ UserRouter.post("/signin", async (req,res)=>{
 
     const Token = jwt.sign({ userId: InputUser._id }, JWT_SECRET);
     
-    res.status(200).json({
+    return res.status(200).json({
         message:"Login successful",
         token: Token
     });
@@ -97,7 +104,7 @@ UserRouter.put("/update",authMiddleware,async (req,res) =>{
         });
     }
     await User.updateOne({_id:req.userId},req.body);
-    res.status(200).json({
+    return res.status(200).json({
         message:"Updated Successfully"
     });
 });
@@ -116,7 +123,7 @@ UserRouter.get("/bulk", async (req,res)=>{
             }
         }]
     })
-    res.json({user:users.map(user=>({
+    return res.json({user:users.map(user=>({
         username:user.username,
         firstname:user.firstname,
         lastname:user.lastname,
