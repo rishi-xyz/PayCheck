@@ -2,6 +2,8 @@ const express = require("express");
 const UserRouter = require("./user");
 const AccountRouter = require("./account");
 
+const app = express();
+app.use(express.json());
 //Single routing
 const rootRouter = express.Router();
 

@@ -7,6 +7,7 @@
  * 5.export
  */
 const mongoose = require("mongoose");
+require('dotenv').config();
 
 //Connect to mongodb
 mongoose.connect(process.env.MONGODB_URI);
@@ -23,13 +24,19 @@ mongoose.connect(process.env.MONGODB_URI);
 
 //More Elegant solution
 const UserSchema = new mongoose.Schema({
-    username:{
-        type:String,
-        required:true,
-        unique:true,
-        trim:true, //remove white spaces from both end of string
-        minlength:3,
-        maxlength:30
+    username: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true,
+        minlength: 3,
+        maxlength: 30,
+        validate:{
+            validator:function(v){
+                return /^\S+@\S+\.\S+$/.test(v);
+            },
+            message: props => `${props.value} is not a valid email!`
+        }
     },
     password:{
         type:String,

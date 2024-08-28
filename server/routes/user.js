@@ -6,6 +6,9 @@ const JWT_SECRET = require("../config");
 const bcrypt = require("bcrypt");
 const { authMiddleware } = require("./middleware");
 
+const app = express();
+app.use(express.json());
+
 const UserRouter = express.Router();
 
 const SignupSchema = z.object({
@@ -15,9 +18,12 @@ const SignupSchema = z.object({
     lastname:z.string().max(50)
 });
 
+
 UserRouter.post("/signup",async(req,res)=>{
     const ParsedBody = SignupSchema.safeParse(req.body);
+    console.log("Parsed body",ParsedBody);
     if (!ParsedBody.success){
+        console.log("Validation Errors:", ParsedBody.error);
         return res.status(411).json({
             message:"Incorrect Inputs"
         })
@@ -25,13 +31,13 @@ UserRouter.post("/signup",async(req,res)=>{
     const BodyUser =  await User.findOne({
         username:req.body.username
     })
-    if(BodyUser._id){
+    if(BodyUser){
         return res.status(411).json({
             message: "Username / Email already exists"
         });
     }
 
-    const HashedPassword = await bcrypt.hash(req .body.password, 10);
+    const HashedPassword = await bcrypt.hash(req.body.password, 10);
 
     const CreateUser = await User.create({
         username:req.body.username,
