@@ -52,14 +52,14 @@ UserRouter.post("/signup",async(req,res)=>{
             balance:1+Math.random()*10000
         });
     
-        const Token = jwt.sign({ userId: CreateUser._id }, JWT_SECRET);
+        const Token = jwt.sign({ userId: CreateUser._id }, JWT_SECRET.JWT_SECRET);
     
         return res.status(200).json({
             message: "User created successfully",
             token: Token
         });
     }catch(error){
-        console.error('Error during signup:', err);
+        console.error('Error during signup:', error);
         return res.status(500).json({
             message: "Internal Server Error"
         });        

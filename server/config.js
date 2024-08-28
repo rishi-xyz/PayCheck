@@ -1,7 +1,5 @@
 require('dotenv').config();
 
-const JWT_SECRET = "rishi-xyz";
-
 module.exports = {
-    JWT_SECRET
+    JWT_SECRET:process.env.JWT_SECRET
 };
