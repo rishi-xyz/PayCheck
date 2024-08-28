@@ -109,26 +109,33 @@ UserRouter.put("/update",authMiddleware,async (req,res) =>{
     });
 });
 
-UserRouter.get("/bulk", async (req,res)=>{
+UserRouter.get("/bulk", async (req, res) => {
     const filter = req.query.filter || "";
 
-    const users = await User.find({
-        $or:[{
-            firstname:{
-                "$regex" : filter
-            }
-        },{
-            lastname:{
-                "$regex":filter
-            }
-        }]
-    })
-    return res.json({user:users.map(user=>({
-        username:user.username,
-        firstname:user.firstname,
-        lastname:user.lastname,
-        _id:user._id,
-    }))})
+    try {
+        // Use a case-insensitive search with the regex and escape special characters in the filter
+        const escapedFilter = filter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escapes special characters
+        const users = await User.find({
+            $or: [
+                { firstname: { "$regex": escapedFilter, "$options": "i" } },
+                { lastname: { "$regex": escapedFilter, "$options": "i" } }
+            ]
+        });
+
+        return res.json({
+            users: users.map(user => ({
+                username: user.username,
+                firstname: user.firstname,
+                lastname: user.lastname,
+                _id: user._id,
+            }))
+        });
+    }catch(err){
+        console.error('Error fetching users:', err);
+        return res.status(500).json({
+            message: "Internal Server Error"
+        });
+    }
 });
 
 module.exports = UserRouter;
