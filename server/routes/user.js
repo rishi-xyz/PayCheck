@@ -21,7 +21,6 @@ const SignupSchema = z.object({
 
 UserRouter.post("/signup",async(req,res)=>{
     const ParsedBody = SignupSchema.safeParse(req.body);
-    console.log("Parsed body",ParsedBody);
     if (!ParsedBody.success){
         console.log("Validation Errors:", ParsedBody.error);
         return res.status(411).json({
@@ -48,11 +47,11 @@ UserRouter.post("/signup",async(req,res)=>{
         });
     
         await Account.create({
-            UserId:CreateUser._id,
+            userId:CreateUser._id,
             balance:1+Math.random()*10000
         });
     
-        const Token = jwt.sign({ userId: CreateUser._id }, JWT_SECRET.JWT_SECRET);
+        const Token = jwt.sign({ UserId: CreateUser._id }, JWT_SECRET.JWT_SECRET);
     
         return res.status(200).json({
             message: "User created successfully",
