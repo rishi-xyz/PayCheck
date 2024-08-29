@@ -8,7 +8,11 @@ const AccountRouter = express.Router();
 
 AccountRouter.get("/balance",authMiddleware,async (req,res)=>{
     try {
-        const FetchedAccount = await FetchAccountById(req.userId);
+        console.log("req user in account.js = ", req.userId)
+        const userId = req.userId
+        console.log("userid after const = ", userId)
+        const FetchedAccount = await FetchAccountById(userId);
+        console.log("Fetched account = ", FetchedAccount)
         if(!FetchedAccount){
             return res.status(404).json({message:"Account not found"});
         }
@@ -28,7 +32,7 @@ const TransferSchema = z.object({
 AccountRouter.post("/transfer",authMiddleware,async(req,res)=>{
     const ParsedBody = TransferSchema.safeParse(req.body);
     if(!ParsedBody.success){
-        return res.status(411).json({
+        return res.status(400).json({
             message:"Incorrect Inputs"
         });
     }
@@ -65,8 +69,12 @@ AccountRouter.post("/transfer",authMiddleware,async(req,res)=>{
     }
 });
 
-async function FetchAccountById({UserId}){
-    return await Account.findOne({UserId});
+async function FetchAccountById(UserId) {
+    console.log("in function user id:", UserId);
+    const Accountfetched = await Account.findOne({ _id: mongoose.Types.ObjectId(UserId)});
+    console.log("account fetched inside function = ", Accountfetched);
+    return Accountfetched;
 }
+
 
 module.exports = AccountRouter;
