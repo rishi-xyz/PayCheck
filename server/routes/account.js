@@ -8,8 +8,8 @@ const AccountRouter = express.Router();
 
 AccountRouter.get("/balance",authMiddleware,async (req,res)=>{
     try {
-        console.log("req user in account.js = ", req.userId)
-        const userId = req.userId
+        console.log("req user in account.js = ", req.authenticateduserId)
+        const userId = req.authenticateduserId
         console.log("userid after const = ", userId)
         const FetchedAccount = await FetchAccountById(userId);
         console.log("Fetched account = ", FetchedAccount)
@@ -40,7 +40,7 @@ AccountRouter.post("/transfer",authMiddleware,async(req,res)=>{
     const TransactionSession = await mongoose.startSession();
     TransactionSession.startTransaction();
     try{
-        const UserAccount = await FetchAccountById(req.userId);
+        const UserAccount = await FetchAccountById(req.authenticateduserId);
         if(!UserAccount){
             throw new Error("Account not Found");
         }
@@ -53,7 +53,7 @@ AccountRouter.post("/transfer",authMiddleware,async(req,res)=>{
         if(!ToAccount){
             throw new Error("Invalid Account");
         }
-        await Account.updateOne({UserId:req.userId},{$inc:{balance:-Amount}}).session(TransactionSession);
+        await Account.updateOne({UserId:req.authenticateduserId},{$inc:{balance:-Amount}}).session(TransactionSession);
         await Account.updateOne({UserId:To},{$inc:{balance:Amount}}).session(TransactionSession);
         await TransactionSession.commitTransaction();
 
@@ -71,7 +71,8 @@ AccountRouter.post("/transfer",authMiddleware,async(req,res)=>{
 
 async function FetchAccountById(UserId) {
     console.log("in function user id:", UserId);
-    const Accountfetched = await Account.findOne({ _id: mongoose.Types.ObjectId(UserId)});
+    const ObjId = new mongoose.Types.ObjectId(UserId)
+    const Accountfetched = await Account.findOne({userId:ObjId});
     console.log("account fetched inside function = ", Accountfetched);
     return Accountfetched;
 }
