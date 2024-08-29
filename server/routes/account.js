@@ -2,17 +2,17 @@ const express  = require("express");
 const { authMiddleware } = require("./middleware");
 const { Account } = require("../database");
 const z = require("zod");
-const { default: mongoose, startSession } = require("mongoose");
+const { default: mongoose } = require("mongoose");
 
 const AccountRouter = express.Router();
 
 AccountRouter.get("/balance",authMiddleware,async (req,res)=>{
     try {
-        const FetchedAccount =  FetchAccountById(req.userId);
+        const FetchedAccount = await FetchAccountById(req.userId);
         if(!FetchedAccount){
             return res.status(404).json({message:"Account not found"});
         }
-        return res.json({
+        return res.status(200).json({
             balance:FetchedAccount.balance
         });
     }catch(error){
@@ -32,11 +32,11 @@ AccountRouter.post("/transfer",authMiddleware,async(req,res)=>{
             message:"Incorrect Inputs"
         });
     }
-    const {To,Amount} = ParsedBody.data;
+    const { to: To, amount: Amount } = ParsedBody.data;
     const TransactionSession = await mongoose.startSession();
     TransactionSession.startTransaction();
     try{
-        const UserAccount = FetchAccountById(req.userId);
+        const UserAccount = await FetchAccountById(req.userId);
         if(!UserAccount){
             throw new Error("Account not Found");
         }
@@ -45,7 +45,7 @@ AccountRouter.post("/transfer",authMiddleware,async(req,res)=>{
                 message:"Insufficient balance"
             });
         }
-        const ToAccount = FetchAccountById(To);
+        const ToAccount = await FetchAccountById(To);
         if(!ToAccount){
             throw new Error("Invalid Account");
         }
@@ -66,9 +66,7 @@ AccountRouter.post("/transfer",authMiddleware,async(req,res)=>{
 });
 
 async function FetchAccountById({UserId}){
-    return await Account.findOne({
-        UserId:UserId
-    });
+    return await Account.findOne({UserId});
 }
 
 module.exports = AccountRouter;
