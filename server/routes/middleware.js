@@ -8,14 +8,10 @@ const authMiddleware = (req,res,next)=>{
             message:"Authorization header missing or invalid"
         });
     }
-
     const token = authHeader.split(" ")[1];
-
     try{
         const decodedToken = jwt.verify(token,JWT_SECRET.JWT_SECRET);
-        console.log(decodedToken);
-        res.authenticateduserId = decodedToken.userId;
-        console.log("locals=",res.authenticateduserId)
+        req.authenticateduserId = decodedToken.UserId;
         next();         
     }catch(error){
         return res.status(403).json({

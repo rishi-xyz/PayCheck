@@ -8,11 +8,8 @@ const AccountRouter = express.Router();
 
 AccountRouter.get("/balance",authMiddleware,async (req,res)=>{
     try {
-        console.log("req user in account.js = ", res.authenticateduserId);
-        const userId = res.authenticateduserId;
-        console.log("userid after const = ", userId);
+        const userId = req.authenticateduserId;
         const FetchedAccount = await FetchAccountById(userId);
-        console.log("Fetched account = ", FetchedAccount);
         if(!FetchedAccount){
             return res.status(404).json({message:"Account not found"});
         }
@@ -69,17 +66,9 @@ AccountRouter.post("/transfer",authMiddleware,async(req,res)=>{
     }
 });
 
-async function FetchAccountById(UserId) {
-    console.log("in function user id:", UserId);
-
-    // Convert UserId to ObjectId
+async function FetchAccountById(UserId){
     const ObjId = new mongoose.Types.ObjectId(UserId);
-    console.log("Object id is =", ObjId);
-
-    // Fetch account using the ObjectId
     const Accountfetched = await Account.findOne({ userId: ObjId });
-    console.log("account fetched inside function =", Accountfetched);
-
     return Accountfetched;
 }
 
