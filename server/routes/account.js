@@ -71,10 +71,15 @@ AccountRouter.post("/transfer",authMiddleware,async(req,res)=>{
 
 async function FetchAccountById(UserId) {
     console.log("in function user id:", UserId);
-    const ObjId = new mongoose.Types.ObjectId(UserId)
-    console.log("Object id is = ",ObjId);
-    const Accountfetched = await Account.findOne({userId:ObjId});
-    console.log("account fetched inside function = ", Accountfetched);
+
+    // Convert UserId to ObjectId
+    const ObjId = new mongoose.Types.ObjectId(UserId);
+    console.log("Object id is =", ObjId);
+
+    // Fetch account using the ObjectId
+    const Accountfetched = await Account.findOne({ userId: ObjId });
+    console.log("account fetched inside function =", Accountfetched);
+
     return Accountfetched;
 }
 
