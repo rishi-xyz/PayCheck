@@ -6,7 +6,7 @@ const { default: mongoose } = require("mongoose");
 
 const AccountRouter = express.Router();
 
-AccountRouter.get("/balance",authMiddleware,async (req,res)=>{
+AccountRouter.get("/balance",authMiddleware,async(req,res)=>{
     try {
         const userId = req.authenticateduserId;
         const FetchedAccount = await FetchAccountById(userId);
@@ -26,59 +26,66 @@ const TransferSchema = z.object({
     amount:z.number().positive()
 }); 
 
-AccountRouter.post("/transfer",authMiddleware,async(req,res)=>{
+AccountRouter.post("/transfer", authMiddleware, async (req, res) => {
     const ParsedBody = TransferSchema.safeParse(req.body);
-    if(!ParsedBody.success){
+    if (!ParsedBody.success) {
         return res.status(400).json({
-            message:"Incorrect Inputs",
-            error:ParsedBody.error
+            message: "Incorrect Inputs",
+            error: ParsedBody.error,
         });
     }
     const { to: To, amount: Amount } = ParsedBody.data;
     const TransactionSession = await mongoose.startSession();
     TransactionSession.startTransaction();
-    console.log("checkpoint 1");
-    try{
+    try {
         const UserAccount = await FetchAccountById(req.authenticateduserId);
-        console.log("checkpoint 2");
-        if(!UserAccount){
+        if (!UserAccount) {
             throw new Error("Account not Found");
         }
-        if(UserAccount.balance < req.body.amount){
+        if (UserAccount.balance < Amount) {
             return res.status(400).json({
-                message:"Insufficient balance"
+                message: "Insufficient balance",
             });
         }
-        console.log("checkpoint 3");
         const ToAccount = await FetchAccountById(To);
-        console.log("checkpoint 4");
-        if(!ToAccount){
+        if (!ToAccount) {
             throw new Error("Invalid Account");
         }
-        console.log("checkpoint 5");
-        await Account.updateOne({UserId:req.authenticateduserId},{$inc:{balance:(balance-Amount)}}).session(TransactionSession);
-        console.log("checkpoint 6");
-        await Account.updateOne({UserId:To},{$inc:{balance:balance+Amount}}).session(TransactionSession);
-        console.log("checkpoint 7");
+        // Subtract from user account
+        const userUpdateResult = await Account.updateOne(
+            { userId: req.authenticateduserId },
+            { $inc: { balance: -Amount } }
+        ).session(TransactionSession);
+        console.log("User account update result:", userUpdateResult);
+
+        // Add to the other account
+        const toAccountUpdateResult = await Account.updateOne(
+            { userId: To },
+            { $inc: { balance: Amount } }
+        ).session(TransactionSession);
+        console.log("To account update result:", toAccountUpdateResult);
+
         await TransactionSession.commitTransaction();
-        console.log("checkpoint 8");
+
+        const Aftercommit = await FetchAccountById(req.authenticateduserId);
+        console.log("User acc after commit", Aftercommit);
+        const ToaccAftercommit = await FetchAccountById(To);
+        console.log("To acc after commit", ToaccAftercommit);
+
         return res.status(200).json({
-            message:"Transfer Successful"
+            message: "Transfer Successful",
         });
-    }catch(error){
+    } catch (error) {
         await TransactionSession.abortTransaction();
-        return res.status(400).json({message:error.message || "Transfer failed"});
-    }finally{
+        return res.status(400).json({ message: error.message || "Transfer failed" });
+    } finally {
         TransactionSession.endSession();
     }
 });
 
 async function FetchAccountById(UserId){
-    console.log("userid input is =",UserId)
     const ObjId = new mongoose.Types.ObjectId(UserId);
-    console.log("objid =",ObjId)
     const Accountfetched = await Account.findOne({ userId: ObjId });
-    console.log("Account fetched is = ",Accountfetched)
     return Accountfetched;
 }
 
