@@ -5,13 +5,14 @@ import { Checkbox } from "../components/Checkbox";
 import { Heading } from "../components/Heading";
 import { InputBox } from "../components/InputBox";
 import { SubHeading } from "../components/SubHeading";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export const Signup = () =>{
   const [Firstname,SetFirstname] = useState("");
   const [Username,setUsername] = useState("");
   const [Password,setPassword] = useState("");
   const [Lastname,setLastname] = useState("");
+  const Navigate = useNavigate();
   return (
     <section class="bg-gray-50 dark:bg-gray-900">
       <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
@@ -47,21 +48,22 @@ export const Signup = () =>{
                     </label>
                   </div>
                 </div>
-                  <Button onClick={async ()=>{
+                  <Button label={"Create an account"} 
+                    onClick={async ()=>{
                     const response = await axios.post("http://localhost:3000/api/v1/user/signup",{
                       username:Username,
                       password:Password,
                       firstname:Firstname,
                       lastname:Lastname
                     });
-                    localStorage.setItem("token",response.data.token)
-                    Navigate("/dashboard")
+                    localStorage.setItem("token",response.data.token);
+                    Navigate("/dashboard");
                   }} 
                   />
                   <p class="text-sm font-light text-gray-500 dark:text-gray-400">
                     Already have an account?
-                    <a href="#" class="ml-1 font-medium text-primary-600 hover:underline dark:text-primary-500">
-                      Login here
+                    <a href={Navigate("/signin")} class="ml-1 font-medium text-primary-600 hover:underline dark:text-primary-500">
+                      Login
                     </a>
                   </p>
               </form>
