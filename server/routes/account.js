@@ -1,6 +1,6 @@
 const express  = require("express");
-const { authMiddleware } = require("./middleware");
-const { Account } = require("../database");
+const { authMiddleware } = require("../middlewares/middleware");
+const { Account } = require("../database/database");
 const z = require("zod");
 const { default: mongoose } = require("mongoose");
 

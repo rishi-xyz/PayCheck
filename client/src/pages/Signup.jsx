@@ -6,6 +6,8 @@ import { Heading } from "../components/Heading";
 import { InputBox } from "../components/InputBox";
 import { SubHeading } from "../components/SubHeading";
 import { useNavigate } from "react-router-dom";
+import { Signupcall } from "../apis/Signupcall";
+
 
 export const Signup = () =>{
   const [Firstname,SetFirstname] = useState("");
@@ -49,15 +51,10 @@ export const Signup = () =>{
                   </div>
                 </div>
                   <Button label={"Create an account"} 
-                    onClick={async ()=>{
-                    const response = await axios.post("http://localhost:3000/api/v1/user/signup",{
-                      username:Username,
-                      password:Password,
-                      firstname:Firstname,
-                      lastname:Lastname
-                    });
-                    localStorage.setItem("token",response.data.token);
-                    Navigate("/dashboard");
+                    onClick={async()=>{
+                      const response = await Signupcall(Username,Password,Firstname,Lastname);
+                      localStorage.setItem("token",response.data.token);
+                      Navigate("/dashboard");
                   }} 
                   />
                   <p class="text-sm font-light text-gray-500 dark:text-gray-400">

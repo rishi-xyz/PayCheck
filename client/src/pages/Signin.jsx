@@ -4,6 +4,7 @@ import { Heading } from "../components/Heading";
 import { InputBox } from "../components/InputBox";
 import { SubHeading } from "../components/SubHeading";
 import { useNavigate } from "react-router-dom";
+import { Signincall } from "../apis/Signincall";
 
 export const Signin = () =>{
 	const Navigate = useNavigate();
@@ -25,12 +26,7 @@ export const Signin = () =>{
                 <div>
                   <Button label={"Login"}
                     onClick={async ()=>{
-                    const response = await axios.post("http://localhost:3000/api/v1/user/signup",{
-                      username:Username,
-                      password:Password,
-                      firstname:Firstname,
-                      lastname:Lastname
-                    });
+                    const response = await Signincall({Username,Password});
                     localStorage.setItem("token",response.data.token);
                     Navigate("/dashboard");
                   }} 
