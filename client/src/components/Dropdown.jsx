@@ -4,20 +4,20 @@ import {useNavigate} from "react-router-dom";
 import {useSetReciolState} from "recoil";
 import {tokenAtom, userAtom} from "../store/atoms";
 
-const Dropdown=()=>{
-	const Navigate = useNavigate();
+const Dropdown =()=>{
+	const navigate = useNavigate();
 	const setToken = useSetReciolState(tokenAtom);
 	const setUser = useSetReciolState(userAtom);
 
 	function DashboardbNavigator(){
-		Navigate("/dashboard");
+		navigate("/dashboard");
 	};
 
 	function HandleSignout(){
 		setToken(null);
 		setUser({firstname:"",lastname:""});
 		localStorage.removeItem("token");
-		Navigate("/");
+		navigate("/");
 	};
 	return (
 		<div className="absolute right-0 top-[110%] bg-slate-100 rounded border border-slate-300">

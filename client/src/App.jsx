@@ -5,6 +5,7 @@ import { Signup } from './pages/Signup';
 import { Signin } from './pages/Signin';
 import Homepage from './pages/Home';
 import PrivateRourte from '../../frontend/src/components/auth/PrivateRourte';
+import SendMoney from './pages/SendMoney';
 
 function App() {
   return (
@@ -20,10 +21,14 @@ function App() {
           </PrivateRourte>
           }
         />
-        <Route path='/send' element={<></>}/>
+        <Route path='/send' element={
+          <PrivateRourte>
+            <SendMoney />
+          </PrivateRourte>
+        }/>
       </Routes>
     </BrowserRouter>
   )
 }
 
-export default App
+export default App;
