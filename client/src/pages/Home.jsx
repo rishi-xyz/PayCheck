@@ -11,7 +11,12 @@ const Homepage = () => {
           <h1 className="text-3xl font-bold text-blue-400">Paycheck</h1>
           <nav className="flex space-x-6">
             <Link to="#features" className="text-gray-300 hover:text-blue-400 font-medium text-lg py-2">Features</Link>
-            <Link to="#contact" className="text-gray-300 hover:text-blue-400 font-medium text-lg py-2">Contact</Link>
+            <a href="https://github.com/rishi-xyz/PayCheck" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-gray-300 hover:text-blue-400 font-medium text-lg py-2">
+                Code
+            </a>
             <div className="flex space-x-4">
               <button onClick={async()=>{Navigate("/signin")}}  className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
                 Sign In

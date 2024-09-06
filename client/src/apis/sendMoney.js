@@ -1,4 +1,4 @@
-import { ApiConnector } from "../components/ApiConnector";
+import  ApiConnector  from "../components/ApiConnector";
 export const sendMoney = async(amount, to, token)=>{
     try{
         const response = await ApiConnector(

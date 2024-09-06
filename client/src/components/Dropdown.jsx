@@ -1,30 +1,31 @@
 import React from "react";
 import DropdownChildern from "../components/Dropdownchildren";
-import {useNavigate} from "react-router-dom";
-import {useSetReciolState} from "recoil";
-import {tokenAtom, userAtom} from "../store/atoms";
+import { useNavigate } from "react-router-dom";
+import { useSetRecoilState } from "recoil";
+import { tokenAtom, userAtom } from "../store/atoms";
 
-const Dropdown =()=>{
-	const navigate = useNavigate();
-	const setToken = useSetReciolState(tokenAtom);
-	const setUser = useSetReciolState(userAtom);
+const Dropdown = () => {
+  const navigate = useNavigate();
+  const setToken = useSetRecoilState(tokenAtom);
+  const setUser = useSetRecoilState(userAtom);
 
-	function DashboardbNavigator(){
-		navigate("/dashboard");
-	};
+  const dashboardNavigator = () => {
+    navigate("/dashboard");
+  };
 
-	function HandleSignout(){
-		setToken(null);
-		setUser({firstname:"",lastname:""});
-		localStorage.removeItem("token");
-		navigate("/");
-	};
-	return (
-		<div className="absolute right-0 top-[110%] bg-slate-100 rounded border border-slate-300">
-			<DropdownChildern label={"Dashboard"} onClick={DashboardbNavigator} />
-			<DropdownChildern label={"Signout"} onClick={HandleSignout} />
-		</div>
-	);
+  const handleSignout = () => {
+    setToken(null);
+    setUser({ firstname: "", lastname: "" });
+    localStorage.removeItem("token");
+    navigate("/");
+  };
+
+  return (
+    <div className="absolute right-0 top-[110%] bg-slate-100 rounded border border-slate-300">
+      <DropdownChildern label={"Dashboard"} onClick={dashboardNavigator} />
+      <DropdownChildern label={"Signout"} onClick={handleSignout} />
+    </div>
+  );
 };
 
 export default Dropdown;

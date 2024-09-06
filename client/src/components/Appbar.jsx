@@ -1,6 +1,6 @@
 import React, { useState } from "react" ;
 import { AiOutlineCaretDown } from "react-icons/ai";
-import {Dropdown} from "../components/Dropdown";
+import Dropdown  from "../components/Dropdown";
 
 const Appbar = ({user}) =>{
 	const [open,setOpen] = useState(false);
